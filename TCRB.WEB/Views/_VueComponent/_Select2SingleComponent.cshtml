@@ -1,0 +1,51 @@
+﻿<template id="select2-single-template">
+    <select style="width:100%">
+        <slot></slot>
+    </select>
+</template>
+<script>
+    Vue.component('select2-single', {
+        props: ['options', 'value', 'name', 'allowclear', 'placeholder', 'defaultselected'],
+        template: '#select2-single-template',
+        mounted: function () {
+            let self = this;
+            let set_init_data;
+            if (!_isNull(self.name)) {
+                $(self.$el).attr('name', self.name);
+            }
+
+            if (self.defaultselected && !_isNull(self.options)) {
+                let selected = _.find(self.options, function (o) { return o.selected; });
+                if (!_isNull(selected)) {
+                    set_init_data = selected.id;
+                }
+            } else {
+                set_init_data = _isNull(self.value) ? null : self.value;
+            }
+
+            $(self.$el)
+                .select2({
+                    data: self.options,
+                    allowClear: self.allowclear,
+                    placeholder: _isNull(self.placeholder) ? "All" : self.placeholder,
+                })
+                .val(set_init_data).trigger('change')
+                .on('change', function () {
+                    self.$emit('input', $(this).val());
+                });
+        },
+        data: function () {
+            return {}
+        },
+        methods: {},
+        watch: {
+            value: function (value) {
+                $(this.$el).val(value).trigger('change');
+                this.$emit('onchange', value);
+            },
+        },
+        destroyed: function () {
+            $(this.$el).off().select2('destroy')
+        },
+    });
+</script>

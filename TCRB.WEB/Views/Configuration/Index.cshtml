@@ -1,0 +1,312 @@
+﻿@using System.Text.Json
+@using TCRB.DAL.EntityModel
+@using TCRB.WEB.Models
+@model TCRB.DAL.Model.Configuration.ConfigurationModel
+@{ ViewData["Title"] = "Template File"; }
+
+<div id="configMaster">
+    @*Inquiry*@
+    <div class="ibox ">
+        <div class="ibox-title">
+            <h5 class="text-primary"><i class="fa fa-search"></i> Search</h5>
+            <div class="ibox-tools">
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <form id="formInquiryMaster" class="form-horizontal" action="javascript:;" method="POST" v-on:submit.prevent="onSubmit()">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">TemplatName</label>
+                            <div class="col-md-9">
+                                <select2-single-ajax :placeholder="'All'"
+                                                     :name="'ID'"
+                                                     :minimum_input="4"
+                                                     :url_option="'@Url.Action("InquiryTemplatename")'"
+                                                     v-model="configurationSearch.ID">
+                                </select2-single-ajax>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Active</label>
+                            <div class="col-md-9">
+                                <select2-single :placeholder="'All'"
+                                                :allowclear="true"
+                                                :name="'IsActive'"
+                                                :options="option_isactive"
+                                                :defaultselected="false"
+                                                v-model="configurationSearch.IsActive"
+                                                v-bind:disabled="false">
+                                </select2-single>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group row pull-right">
+                            <div class="col-md-12">
+                                <button class="btn btn-w-m btn-primary btn-sm" type="submit"><i class="fa fa-search"></i> ค้นหา</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @*Datatable*@
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5 class="text-primary" id="titleMessage"></h5>
+                    <div class="ibox-tools">
+                        <button type="button" class="btn btn-w-m btn-success btn-sm" data-toggle="modal" data-target="#modalTemplateName"><i class="fa fa-plus"></i> สร้าง</button>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="material-datatables table-responsive" id="div_dataTableInquiryMaster"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Modal Create, Update*@
+    <div class="modal inmodal fade animated fadeInDown" id="modalTemplateName" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="formConfigurationSave" class="form-horizontal" data-vv-scope="form-ConfigurationSave" v-on:submit.prevent="onSave()">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title">{{ titleModal }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div :class="{'form-group': true, 'row': true, 'has-error': errors.has('form-ConfigurationSave.TemplateName') }">
+                                    <label class="col-md-3 col-form-label">Name <span class="text-danger"> *</span></label>
+                                    <div class="col-md-9">
+                                        <input type="text" autocomplete="off"
+                                               name="TemplateName"
+                                               class="form-control"
+                                               v-validate="'required'"
+                                               v-model="configuration.TemplateName"
+                                               :disabled="!IsCreate">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label">Active</label>
+                                    <div class="col-md-9">
+                                        <select2-single :placeholder="'IsActive'"
+                                                        :allowclear="false"
+                                                        :name="''"
+                                                        :options="option_isactive"
+                                                        :defaultselected="true"
+                                                        v-model="configuration.IsActive"
+                                                        v-bind:disabled="false">
+                                        </select2-single>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div :class="{'form-group': true, 'row': true, 'has-error': errors.has('form-ConfigurationSave.InputFile') }">
+                                    <label class="col-md-3 col-form-label">InputFile <span class="text-danger"> *</span></label>
+                                    <div class="col-md-9">
+                                        <input type="text" autocomplete="off"
+                                               name="InputFile"
+                                               class="form-control"
+                                               v-validate="'required'"
+                                               v-model="configuration.InputFile">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div :class="{'form-group': true, 'row': true, 'has-error': errors.has('form-ConfigurationSave.OutputFile') }">
+                                    <label class="col-md-3 col-form-label">OutputFile <span class="text-danger"> *</span></label>
+                                    <div class="col-md-9">
+                                        <input type="text" autocomplete="off"
+                                               name="OutputFile"
+                                               class="form-control"
+                                               v-validate="'required'"
+                                               v-model="configuration.OutputFile">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" :disabled="actionBtnSave"><i class="fa fa-save"></i> บันทึก</button>
+                        <button type="button" class="btn btn-white" data-dismiss="modal"> <i class="fa fa-times"></i> ปิด</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+@section scripts{
+
+    @await Html.PartialAsync("~/Views/_VueComponent/_Select2SingleComponent.cshtml")
+    @await Html.PartialAsync("~/Views/_VueComponent/_Select2SingleAjaxComponent.cshtml")
+    <script type="text/javascript">
+        //=====================================
+        //========== Global variable ==========
+        //=====================================
+        let dataTableInquiry;
+
+        //=====================================
+        //=============== Vue. ================
+        //=====================================
+        Vue.use(VeeValidate);
+        var configMaster = new Vue({
+            el: '#configMaster',
+            data: function () {
+                return {
+                    //=============== Model ===============
+                    configurationViewModel:@Html.Raw(JsonSerializer.Serialize(new TCRB.DAL.Model.Configuration.ConfigurationModel())),
+                    masterModel:  @Html.Raw(JsonSerializer.Serialize(new ConfigurationMaster())),
+                    detailModel:  @Html.Raw(JsonSerializer.Serialize(new ConfigurationDetail())),
+                    //=============== Data ================
+                    configurationSearch: { TemplateName: '', IsActive: '' },
+                    configuration:@Html.Raw(JsonSerializer.Serialize(new TCRB.DAL.Model.Configuration.ConfigurationModel())),
+                    //============= Template ==============
+                    option_isactive: [
+                        { id: 'true', text: 'ACTIVE', selected: true },
+                        { id: 'false', text: 'INACTIVE', selected: false },
+                    ],
+                }
+            },
+            methods: {
+                onSubmit() {
+                    table_Search.fnDraw();
+                },
+                onSave() {
+                    let self = this;
+                    self.$validator.validateAll('form-ConfigurationSave').then((result) => {
+                        if (result) {
+                            let url = self.configuration.ID === _Enum.GuidEmpty ? '@Url.Action("Create")' : '@Url.Action("Update")';
+                            _ajax(_Config.AjaxType.Post, url, self.configuration, true, function (res) {
+                                if (res.Success) {
+                                    self.configuration = _.cloneDeep(self.configurationViewModel);
+                                    self.configuration.IsActive = 'true';
+                                    self.onSubmit();
+                                    _toastrSuccess(_Enum.Message.SaveSuccess);
+                                    $('#modalTemplateName').modal('hide');
+                                } else {
+                                    _toastrError(_Enum.Message.SaveFail);
+                                }
+                            });
+                        }
+                    });
+                },
+                onDelete() {
+                    let self = this;
+                    _AlertConfirm(_Config.Confirm.Red, "fa fa-trash", "ลบข้อมูล", `คุณต้องการลบ ${self.configuration.TemplateName} ใช่หรือไม่?`, "ใช่", "ไม่",
+                        function (res) {
+                            if (res) {
+
+                            }
+                        });
+                },
+                onCloseModel() {
+                    let self = this;
+                    self.configuration = _.cloneDeep(self.configurationViewModel);
+                    self.configuration.IsActive = 'true';
+                    self.errors.clear();
+                    self.$validator.reset();
+                },
+            },
+            beforeMount() { },
+            mounted() {
+                let self = this;
+                self.configuration.IsActive = 'true';
+
+                $('#modalTemplateName').on('hidden.bs.modal', function () {
+                    self.onCloseModel();
+                });
+
+                //========== Data Table ==========
+                table_Search = _dataTable("#div_dataTableInquiryMaster", "dataTableInquiryMaster", "formInquiryMaster",
+                    {
+                        url: '@Url.Action("InquiryMasterDatatable")',
+                        columns: [
+                            { title: "TemplateName", data: "TemplateName", sClass: "" },
+                            { title: "InputFile", data: "InputFile", sClass: "", bSortable: true },
+                            { title: "OutputFile", data: "OutputFile", sClass: "", bSortable: true },
+                            {
+                                title: "CreateDate",
+                                data: "CreateDate",
+                                sClass: "text-center",
+                                bSortable: true,
+                                render: (o) => { return _Filter.DateTime.DDMMYYYYHHmmss(o) }
+                            },
+                            { title: "CreateBy", data: "CreateBy", sClass: "", bSortable: true },
+                            {
+                                title: "UpdateDate",
+                                data: "UpdateDate",
+                                sClass: "text-center",
+                                bSortable: true,
+                                render: (o) => { return _Filter.DateTime.DDMMYYYYHHmmss(o) }
+                            },
+                            { title: "UpdateBy", data: "UpdateBy", sClass: "", bSortable: true },
+                        ],
+                        order: [[4, _Config.DataTable.DESC]],
+                        autoRow: true,
+                        btnAction: true,
+                        btnEdit: true,
+                        btnDelete: true
+                    },
+                    function () {
+                    }).on('click', 'a', 'tr', function () {
+                        let obj = table_Search.fnGetData($(this).parents('tr')[0]);
+                        switch ($(this).attr('data-action')) {
+                            case _Enum.Operation.Update.Text:
+                                _.assign(self.configuration, obj)
+                                self.configuration.IsActive = obj.IsActive === null ? 'false' : `${obj.IsActive}`;
+                                $('#modalTemplateName').modal('show');
+                                break;
+                            case _Enum.Operation.Delete.Text:
+                                _.assign(self.configuration, obj)
+                                self.onDelete();
+                                break;
+                            case _Enum.Operation.VIEW.Text:
+                                window.open('@Url.Action("Detail", "Configuration")?id=' + obj.ID, '_blank');
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+            },
+            filters: {},
+            computed: {
+                titleModal() {
+                    return (_isNull(this.configuration)) || this.configuration.ID === _Enum.GuidEmpty ? 'สร้าง Template' : `แก้ไข Template: ${this.configuration.TemplateName}`;
+                },
+                IsCreate() {
+                    return _Enum.GuidEmpty === this.configuration.ID;
+                },
+                actionBtnSave() {
+                    let self = this;
+                    return (_isNull(self.configuration.TemplateName) || _isNull(self.configuration.InputFile) || _isNull(self.configuration.OutputFile));
+                }
+            },
+            watch: {},
+        });
+    </script>
+}

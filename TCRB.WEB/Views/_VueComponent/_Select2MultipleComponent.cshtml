@@ -1,0 +1,53 @@
+﻿<template id="select2-muliple-template">
+    <select id="TT" multiple style="width:100%">
+        <slot></slot>
+    </select>
+</template>
+
+<script>
+    Vue.component('select2-multiple', {
+        props: ['options', 'value', 'name', 'placeholder', 'defaultselected'],
+        template: '#select2-muliple-template',
+        mounted: function () {
+            var self = this;
+            let set_init_data = [];
+
+            if (!_isNull(self.name)) {
+                $(self.$el).attr('name', self.name);
+            }
+
+            if (self.defaultselected && !_isNull(self.options)) {
+                set_init_data = _.filter(self.options, function (o) {
+                    if (o.selected === true) { return o.selected; }
+                }).map(function (item) { return item.id; });
+            } else {
+                set_init_data = _isNull(self.value) ? null : self.value;
+            }
+
+            $(self.$el)
+                .select2({
+                    data: self.options,
+                    allowClear: false,
+                    placeholder: _isNull(self.placeholder) ? '' : self.placeholder
+                })
+                .val(set_init_data).trigger('change')
+                .on('change', function () {
+                    self.$emit('input', $(this).val());
+                });
+        },
+        data: function () {
+            return {}
+        },
+        watch: {
+            value: function (value) {
+                if ([...value].sort().join(",") !== [...$(this.$el).val()].sort().join(",")) {
+                    $(this.$el).val(value).trigger('change');
+                    this.$emit('onchange', value);
+                }
+            },
+        },
+        destroyed: function () {
+            $(this.$el).off().select2('destroy');
+        },
+    });
+</script>

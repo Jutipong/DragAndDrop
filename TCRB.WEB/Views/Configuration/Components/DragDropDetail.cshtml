@@ -1,0 +1,260 @@
+﻿@using TCRB
+@using System.Text.Json
+@using TCRB.HELPER.Enum
+@using TCRB.DAL.EntityModel
+@model TCRB.DAL.Model.Configuration.ConfigurationModel
+@{
+    var optionType = new List<TCRB.DAL.Model.Commons.Select2Model> {
+        new TCRB.DAL.Model.Commons.Select2Model{
+            text = EnumTypeValue.String.AsDescription(),
+            id = EnumTypeValue.String.AsDescription(),
+            selected = true
+        },
+        new TCRB.DAL.Model.Commons.Select2Model
+        {
+            text = EnumTypeValue.Int32.AsDescription(),
+            id = EnumTypeValue.Int32.AsDescription(),
+
+        },
+        new TCRB.DAL.Model.Commons.Select2Model
+        {
+            text = EnumTypeValue.Decimal.AsDescription(),
+            id = EnumTypeValue.Decimal.AsDescription(),
+
+        },
+        new TCRB.DAL.Model.Commons.Select2Model
+        {
+            text = EnumTypeValue.Boolean.AsDescription(),
+            id = EnumTypeValue.Boolean.AsDescription(),
+
+        },
+        new TCRB.DAL.Model.Commons.Select2Model
+        {
+            text = EnumTypeValue.DateTime.AsDescription(),
+            id = EnumTypeValue.DateTime.AsDescription(),
+
+        }
+    };
+}
+
+<template id="dragdrop-detail">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2>Configurations Detail.</h2>
+                            <div class="input-group pb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-addon">
+                                        Sorting Data <u class="text-success">Drag And Drop</u>&nbsp;&nbsp;
+                                        <input type="checkbox" v-model="isDraggable" :disabled="IsDragDrop">
+                                    </span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Search" autocomplete="off" v-model="searchQuery" :disabled="IsData" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row pt-2 pb-2">
+                        <div class="col-md-12 text-right">
+                            <button type="button" class="btn btn-w-m btn-primary btn-sm" :disabled="IsData" @@click="SaveDetail()"><i class="fa fa-save"></i> บันทึก</button>
+                            <button type="button" class="btn btn-w-m btn-success btn-sm" @@click="AddDetail()"><i class="fa fa-plus"></i> เพิ่ม</button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                            <form id="formConfigurationSave" class="form-horizontal fullscreen" data-vv-scope="form-config-detail">
+                                <table id="configDetailTable" class="table table-bordered table-hover dataTable no-footer">
+                                    <thead class="bg-primary">
+                                        <tr>
+                                            <th class="text-center" style="width:40px;">Order</th>
+                                            <th class="text-center" style="min-width:250px;">FieldName</th>
+                                            <th class="text-center" style="min-width:120px;">Type</th>
+                                            <th class="text-center" style="min-width:100px;">Required</th>
+                                            <th class="text-center">Length</th>
+                                            <th class="text-center">Len</th>
+                                            <th class="text-center">Des</th>
+                                            <th class="text-center">#</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="" :disabled="!isDraggable" is="draggable" :list="resultQuery" tag="tbody">
+                                        <tr v-if="!IsData" v-for="(item, index) in resultQuery" :key="item.ID">
+                                            <td class="text-center align-middle">{{ item.Order }}</td>
+                                            <td>
+                                                <div :class="{'has-error': errors.has('form-config-detail.FieldName'+index) }">
+                                                    <input class="form-control" type="text" autocomplete="off"
+                                                           :key="'FieldName'+index"
+                                                           :name="'FieldName'+index"
+                                                           v-model="item.FieldName"
+                                                           :readonly="!item.isEdit"
+                                                           v-validate="'required'" />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <select2-single :placeholder="''"
+                                                                :allowclear="false"
+                                                                :name="''"
+                                                                :options="option_type"
+                                                                :defaultselected="false"
+                                                                :disabled="!item.isEdit"
+                                                                v-model="item.Type">
+                                                </select2-single>
+                                            </td>
+                                            <td>
+                                                <select2-single :placeholder="''"
+                                                                :allowclear="false"
+                                                                :name="''"
+                                                                :options="option_required"
+                                                                :defaultselected="false"
+                                                                :disabled="!item.isEdit"
+                                                                v-model="item.Required">
+                                                </select2-single>
+                                            </td>
+                                            <td>
+                                                <input-number v-model="item.Length" :disabled="!item.isEdit"></input-number>
+                                            </td>
+                                            <td>
+                                                <input-number v-model="item.Len" :disabled="!item.isEdit"></input-number>
+                                            </td>
+                                            <td>
+                                                <input-number v-model="item.Des" :disabled="!item.isEdit"></input-number>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <a v-if="item.isEdit === false" class="text-center text-danger" @@click="DeleteDetail(index)"><i class="fa fa-trash p-1"></i></a>
+                                                <a v-if="item.isEdit === false" class="text-center text-success" @@click="item.isEdit = !item.isEdit"><i class="fa fa-edit p-1"></i></a>
+                                                <a v-if="item.isEdit === true" class="text-center text-primary" @@click="item.isEdit = !item.isEdit"><i class="fa fa-floppy-o p-1"></i></a>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="IsData">
+                                            <td class="text-center" colspan="8">ไม่พบข้อมูล</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</template>
+
+<script src="~/lib/vue-draggable/Sortable.min.js"></script>
+<script src="~/lib/vue-draggable/vuedraggable.umd.min.js"></script>
+
+<script>
+
+    Vue.component('dragdrop-detail-component', {
+        template: '#dragdrop-detail',
+        props: {
+            lists: {
+                default: () => []
+            },
+        },
+        data() {
+            let self = this;
+            return {
+                //=============== Model ===============
+                detailModel:  @Html.Raw(JsonSerializer.Serialize(new ConfigurationDetail())),
+                //=============== Data ================
+                isDraggable: false,
+                detailLists:  @Html.Raw(JsonSerializer.Serialize(new List<ConfigurationDetail>())),
+                option_type: @Html.Raw(JsonSerializer.Serialize(optionType)),
+                option_isactive: [
+                    { id: 'true', text: 'ACTIVE', selected: true },
+                    { id: 'false', text: 'INACTIVE', selected: false },
+                ],
+                option_required: [
+                    { id: 'true', text: 'Y', selected: true },
+                    { id: 'false', text: 'N', selected: false },
+                ],
+                searchQuery: '',
+            }
+        },
+        mounted() { },
+        computed: {
+            resultQuery() {
+                let lists = this.detailLists;
+                if (this.searchQuery) {
+                    lists = lists.filter((p) => {
+                        //return (!_isNull(p.Order) && _.toString(p.Order).indexOf(this.searchQuery) !== -1)
+                        return (!_isNull(p.FieldName) && p.FieldName.indexOf(this.searchQuery) !== -1)
+                    });
+                }
+                return lists;
+            },
+            IsData() {
+                return _isNull(this.detailLists) || this.detailLists.length === 0;
+            },
+            IsDragDrop() {
+                return _isNull(this.detailLists) || this.detailLists.length < 2;
+            }
+        },
+        methods: {
+            InitData() {
+                //Init Data
+                var obj = _.cloneDeep(this.detailModel)
+                obj.ID = _genID(13);
+                obj.isEdit = true;
+                obj.Required = 'true';
+                obj.Type = '@Html.Raw(EnumTypeValue.String.AsDescription())';
+                return obj;
+            },
+            AddDetail() {
+                this.detailLists.push(this.InitData());
+            },
+            DeleteDetail(index) {
+                let self = this;
+                _AlertConfirm(_Config.Confirm.Red, "fa fa-trash", "ลบข้อมูล", `คุณต้องการลบ FieldName: ${self.detailLists[index].FieldName} ใช่หรือไม่?`, "ใช่", "ไม่",
+                    function (res) {
+                        if (res) {
+                            Vue.delete(self.detailLists, index);
+                            self.$nextTick(function () {
+                                this.$validator.validateAll('form-config-detail').then((result) => { });
+                            });
+                        }
+                    });
+            },
+            SaveDetail() {
+                let self = this;
+                self.$validator.validateAll('form-config-detail').then((result) => {
+                    console.log("validate => " ,result);
+                    if (result) {
+                        this.$emit('update-detail', this.detailLists);
+                    } else {
+                        _toastrError('กรุณากรอกข้อมูลให้ครบถ้วน');
+                    }
+                });
+            }
+        },
+        watch: {
+            lists() {
+                let self = this;
+                self.detailLists = _.cloneDeep(self.lists);
+                //Vue.set(self, 'detailLists', self.lists);
+                _.forEach(self.detailLists, (item) => {
+                    Vue.set(item, 'isEdit', false);
+                    item.isEdit = false;
+                });
+            },
+            detailLists() {
+                let self = this;
+                //if (self.isDraggable === false) return false;
+
+                let _order = 1;
+                self.detailLists = _.forEach(self.detailLists, function (item) {
+                    item.Order = _order;
+                    _order++;
+                });
+            }
+        },
+        destroy() {
+            this.$destroy();
+        }
+    });
+</script>

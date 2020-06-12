@@ -1,0 +1,57 @@
+﻿<template id="input-int-number-template">
+    @*<input class="form-control" type="text" v-model="amount" v-on:change="emitValue" v-on:blur="handleBlur" />*@
+    <input class="form-control text-right" type="text" v-model.number="amount" v-on:change="emitValue" @@keydown="filterKey" @@input="filterInput" />
+</template>
+<script>
+    Vue.component("input-number", {
+        template: "#input-int-number-template",
+        props: {
+            value: {
+                default: () => null
+            },
+            maxvalue: {
+                default: () => null
+            }
+        },
+        data: () => ({
+            amount: null
+        }),
+        mounted: function () {
+            var self = this;
+            if (!_isNull(self.value) && _.isNumber(self.value)) {
+                self.amount = self.value
+            } else {
+                self.amount = 0;
+            }
+        },
+        methods: {
+            filterKey(e) {
+                const key = e.key;
+                // If is '.' key, stop it
+                if (key === '.') {
+                    return e.preventDefault();
+                }
+                // OPTIONAL
+                // If is 'e' key, stop it
+                if (key === 'e') {
+                    return e.preventDefault();
+                }
+            },
+            filterInput(e) {
+                // This can also prevent copy + paste invalid character
+                e.target.value = e.target.value.replace(/[^0-9]+/g, '');
+            },
+            emitValue: function () {
+                if (!_isNull(this.amount) && _.isNumber(this.amount)) {
+                    this.$emit('input', this.amount);
+                } else {
+                    this.amount = 0;
+                    this.$emit('input', 0);
+                }
+            },
+        },
+        watch: {
+
+        }
+    });
+</script>

@@ -1,0 +1,81 @@
+﻿@{ ViewData["Title"] = "Login..";
+    Layout = null; }
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCRB | Login</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/css/animate.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link href="~/lib/ladda/ladda-themeless.min.css" rel="stylesheet" />
+</head>
+
+<body class="gray-bg">
+
+    <div class="loginColumns animated fadeInDown">
+        <div class="row">
+
+            <div class="col-md-6">
+                <h2 class="font-bold">┻━┻ ヘ╰( •̀ε•́ ╰)</h2>
+            </div>
+            <div class="col-md-6">
+                <div class="ibox-content">
+                    <div class="text-center">
+                        <img alt="image" class="rounded" src="~/images/TCR-Logo-onwhite.svg" style="width:250px;">
+                        @*<h2 class="font-bold text-center">TCRB</h2>*@
+                    </div>
+                    <form class="m-t" role="form" action="javascript:;" id="form-login" method="post">
+                        <br />
+                        <br />
+                        <div class="form-group">
+                            <input type="text" tabindex="1" class="form-control username" placeholder="Username" required="" value="admin">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" tabindex="2" class="form-control password" placeholder="Password" required="" value="admin">
+                        </div>
+                        <button type="submit" id="btnLogin" class="btn ladda-button ladda-button-demo btn-primary block full-width m-b" data-style="zoom-out">Login</button>
+                        <br />
+                    </form>
+                </div>
+            </div>
+        </div>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <hr />
+    </div>
+</body>
+
+</html>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/ladda/spin.min.js"></script>
+<script src="~/lib/ladda/ladda.min.js"></script>
+<script src="~/lib/lodash/core.js"></script>
+<script src="~/lib/Customs.js"></script>
+<script>
+    $(function () {
+        $('#btnLogin').click(function (e) {
+            if (_isNull($('.username').val()) && _isNull($('.password'))) return false;
+            e.preventDefault();
+            var l = Ladda.create(this);
+            l.start();
+            _ajax(_Config.AjaxType.Post, '@Url.Action("Index")', {
+                UserName: "UserName",
+                Password: "Password"
+            }, false, function (res) {
+                if (res.Success) {
+                    $(location).attr('href', res.Datas);
+                } else {
+                    l.stop();
+                }
+            });
+        });
+    });
+</script>

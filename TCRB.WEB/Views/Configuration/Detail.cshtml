@@ -1,0 +1,100 @@
+﻿@using System.Text.Json
+@using TCRB.DAL.EntityModel
+@*@using TCRB.WEB.Models*@
+@using TCRB.HELPER.Enum
+@using TCRB
+@model TCRB.DAL.Model.Configuration.ConfigurationModel
+
+
+<style>
+    .modal-full80 {
+        min-width: 80%;
+    }
+</style>
+
+<div id="appConfigDetail">
+
+    <dragdrop-detail-component :lists="detailList" v-on:update-detail="onSave($event)">
+    </dragdrop-detail-component>
+
+</div>
+@section scripts{
+
+    @await Html.PartialAsync("~/Views/_VueComponent/_NumberComponent.cshtml")
+    @await Html.PartialAsync("~/Views/_VueComponent/_Select2SingleComponent.cshtml")
+    @await Html.PartialAsync("~/Views/Configuration/Components/DragDropDetail.cshtml")
+
+<script type="text/javascript">
+        //=====================================
+        //========== Global variable ==========
+        //=====================================
+
+        //=====================================
+        //=============== Vue. ================
+        //=====================================
+        Vue.use(VeeValidate);
+        var appConfigDetail = new Vue({
+            el: '#appConfigDetail',
+            data: function () {
+                return {
+                    //=============== Model ===============
+                    configurationViewModel:@Html.Raw(JsonSerializer.Serialize(new ConfigurationDetail())),
+                    masterModel:  @Html.Raw(JsonSerializer.Serialize(new ConfigurationMaster())),
+                    detailModel:  @Html.Raw(JsonSerializer.Serialize(new ConfigurationDetail())),
+                    detailListModel:  @Html.Raw(JsonSerializer.Serialize(new List<ConfigurationDetail>())),
+                    //=============== Data ================
+                    master:@Html.Raw(Json.Serialize(Model)),
+                    detailList: @Html.Raw(JsonSerializer.Serialize(new List<ConfigurationDetail>())),// self.onLoadDetail(@Html.Raw(Json.Serialize(Model.ID))),
+                    //============= Template ==============
+                }
+            },
+            methods: {
+                onLoadDetail(id) {
+                    let self = this;
+                    _ajax(_Config.AjaxType.Post, '@Url.Action("InquiryDetail")', { masterID: id }, true, function (res) {
+                        if (res.Success) {
+                            Vue.set(self, 'detailList', _.forEach(res.Datas, (item) => { item.isEdit = false; }));
+                        } else {
+                            self.lists = [];
+                            _toastrError(res.Message);
+                        }
+                    });
+                },
+                onSave(objs) {
+                    let self = this;
+                    debugger;
+                    _.forEach(objs, (item) => { item.ConfigurationID = self.master.ID; });
+
+                    _ajax(_Config.AjaxType.Post, '@Url.Action("CreateDetail")', objs, true, function (res) {
+                        if (res.Success) {
+
+                        } else {
+                            _toastrError(_Enum.Message.SaveFail);
+                        }
+                    });
+
+
+                    @*_ajax(_Config.AjaxType.Post, '@Url.Action("CreateDetail")', objs, true, function (res) {
+                        if (res.Success) {
+                            _toastrSuccess(_Enum.Message.SaveSuccess);
+                            //Reload detailLists data.
+                            self.onLoadDetail();
+                        } else {
+                            self.lists = [];
+                            _toastrError(res.Message);
+                        }
+                    });*@
+                }
+            },
+            beforeMount() { },
+            mounted() {
+                let self = this;
+                self.onLoadDetail();
+            },
+            filters: {},
+            computed: {
+            },
+            watch: {},
+        });
+</script>
+}

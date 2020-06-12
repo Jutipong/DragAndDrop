@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\StoredProcedure\**" />
+    <Compile Remove="Models\TableType\**" />
+    <Compile Remove="Response\**" />
+    <EmbeddedResource Remove="Models\StoredProcedure\**" />
+    <EmbeddedResource Remove="Models\TableType\**" />
+    <EmbeddedResource Remove="Response\**" />
+    <None Remove="Models\StoredProcedure\**" />
+    <None Remove="Models\TableType\**" />
+    <None Remove="Response\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+  </ItemGroup>
+
+</Project>

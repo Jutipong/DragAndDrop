@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TCRB - @ViewData["Title"] </title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    @if (IsSectionDefined("Styles"))
+    {@RenderSection("Styles", required: false)}
+
+    <environment names="Development">
+        <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="~/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+        <link href="~/css/animate.css" rel="stylesheet" />
+        <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+        <!-- dataTable -->
+        <link href="~/lib/dataTables/datatables.min.css" rel="stylesheet" />
+        <!-- Select2 -->
+        <link href="~/lib/select2/css/select2.min.css" rel="stylesheet" />
+        <!-- toastr -->
+        <link href="~/lib/toastr/toastr.min.css" rel="stylesheet" />
+        <!-- Jquery Confirm -->
+        <link href="~/lib/jquery-confirm/jquery-confirm.min.css" rel="stylesheet" />
+    </environment>
+
+    <environment names="Staging,Production">
+        <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="~/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+        <link href="~/css/animate.css" rel="stylesheet" />
+        <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+        <!-- dataTable -->
+        <link href="~/lib/dataTables/datatables.min.css" rel="stylesheet" />
+        <!-- Select2 -->
+        <link href="~/lib/select2/css/select2.min.css" rel="stylesheet" />
+        <!-- toastr -->
+        <link href="~/lib/toastr/toastr.min.css" rel="stylesheet" />
+        <!-- Jquery Confirm -->
+        <link href="~/lib/jquery-confirm/jquery-confirm.min.css" rel="stylesheet" />
+    </environment>
+
+    <!-- bootstrap datepicker -->
+    <link href="~/lib/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet" />
+
+    <style>
+        .BlockUI {
+            position: fixed;
+            opacity: 0.60;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: url(@Url.Content("~/images/g-dots.gif")) center no-repeat #fff;
+        }
+/*
+        .col-form-label {
+            text-align: right;
+        }*/
+
+        body {
+            font-family: Arial, Verdana, sans-serif !important;
+            font-size: 9pt !important;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .select2-container--open {
+            z-index: 9999999
+        }
+    </style>
+
+</head>
+<body class="skin-1 fixed-sidebar fixed-nav fixed-nav-basic">
+    <div class="BlockUI" style="display:none;"></div>
+    <!-- Wrapper-->
+    <div id="wrapper" class="@Html.PageClass()">
+        <!-- Navigation -->
+        <partial name="_Navigation" />
+        <!-- Page wraper -->
+        <div id="page-wrapper" class="gray-bg @ViewBag.SpecialClass">
+            <!-- Top Navbar -->
+            <partial name="_TopNavbar" />
+
+            <!-- Main view  -->
+            <div class="wrapper wrapper-content animated fadeIn">
+                @RenderBody()
+            </div>
+
+            <!-- Footer -->
+            <partial name="_Footer" />
+        </div>
+        <!-- End page wrapper-->
+    </div>
+    <!-- End wrapper-->
+    <environment names="Development">
+        <!-- Base js -->
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/vue/vue.js"></script>
+        <script src="~/lib/lodash/core.js"></script>
+
+        <!-- Plugins -->
+        @*<script src="~/lib/Popper/popper.min.js"></script>*@
+        <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="~/lib/metisMenu/dist/jquery.metisMenu.js"></script>
+        <script src="~/lib/slimScroll/jquery.slimscroll.min.js"></script>
+        <script src="~/lib/pace/pace.min.js"></script>
+        <script src="~/lib/toastr/toastr.min.js"></script>
+        <script src="~/js/script.js" asp-append-version="true"></script>
+
+        <!-- Data picker -->
+        <script src="~/lib/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+        <script src="~/lib/bootstrap-datepicker/js-thai/bootstrap-datepicker-thai.js"></script>
+        <script src="~/lib/bootstrap-datepicker/js-thai/locales/bootstrap-datepicker.th.js"></script>
+        <!-- dataTable -->
+        <script src="~/lib/dataTables/datatables.min.js"></script>
+        <script src="~/lib/dataTables/dataTables.bootstrap4.min.js"></script>
+        <!-- Select2 -->
+        <script src="~/lib/select2/js/select2.min.js"></script>
+        <!-- Input Number -->
+        <script src="~/lib/number/jquery.number.js"></script>
+        <!-- moment -->
+        <script src="~/lib/moment/moment.js"></script>
+        <script src="~/lib/moment/th.js"></script>
+        <!-- Jquery Confirm -->
+        <script src="~/lib/jquery-confirm/jquery-confirm.min.js"></script>
+        <!-- Jquery vee validate -->
+        <script src="~/lib/vee-validate/vee-validate.min.js"></script>
+        <!-- Customs.js -->
+        <script src="~/lib/Customs.js"></script>
+    </environment>
+
+    <environment names="Staging,Production">
+        <!-- Base js -->
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/vue/vue.js"></script>
+        <script src="~/lib/lodash/core.js"></script>
+
+        <!-- Plugins -->
+        <script src="~/lib/Popper/popper.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="~/lib/metisMenu/dist/jquery.metisMenu.js"></script>
+        <script src="~/lib/slimScroll/jquery.slimscroll.min.js"></script>
+        <script src="~/lib/pace/pace.min.js"></script>
+        <script src="~/lib/toastr/toastr.min.js"></script>
+        <script src="~/js/script.js" asp-append-version="true"></script>
+
+        <!-- Data picker -->
+        <script src="~/lib/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+        <script src="~/lib/bootstrap-datepicker/js-thai/bootstrap-datepicker-thai.js"></script>
+        <script src="~/lib/bootstrap-datepicker/js-thai/locales/bootstrap-datepicker.th.js"></script>
+        <!-- dataTable -->
+        <script src="~/lib/dataTables/datatables.min.js"></script>
+        <script src="~/lib/dataTables/dataTables.bootstrap4.min.js"></script>
+        <!-- Select2 -->
+        <script src="~/lib/select2/js/select2.min.js"></script>
+        <!-- Input Number -->
+        <script src="~/lib/number/jquery.number.js"></script>
+        <!-- moment -->
+        <script src="~/lib/moment/moment.js"></script>
+        <script src="~/lib/moment/th.js"></script>
+        <!-- Jquery Confirm -->
+        <script src="~/lib/jquery-confirm/jquery-confirm.min.js"></script>
+        <!-- Jquery vee validate -->
+        <script src="~/lib/vee-validate/vee-validate.min.js"></script>
+        <!-- Customs.js -->
+        <script src="~/lib/Customs.js"></script>
+    </environment>
+
+    @RenderSection("scripts", required: false)
+
+    <script type="text/javascript">
+        $(function () {
+            moment.suppressDeprecationWarnings = true;
+            moment.locale('th');
+            var _date = moment().add(543, 'year').format('วันdddd ที่ LL');
+            $("#_date").text(_date);
+
+            $("#logout").click(function () {
+                _AlertConfirm(_Config.Confirm.Red, "fa fa-sign-out", "ออกจากระบบ", "คุณต้องการออกจากระบบ ใช่หรือไม่ ?", "ใช่", "ไม่", function (res) {
+                    if (res) {
+                        window.location = '@Url.Action("Logout", "Login")';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

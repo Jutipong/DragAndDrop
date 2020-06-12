@@ -1,0 +1,68 @@
+﻿<template id="datepicker-template">
+    <input type="text" class="form-control datepicker" autocomplete="off" />
+</template>
+
+<script>
+    Vue.component('datepicker-component', {
+        template: '#datepicker-template',
+        props: {
+            value: {
+                default: () => null
+            },
+            startdate: {
+                default: () => null
+            },
+            enddate: {
+                default: () => null
+            }
+        },
+        mounted: function () {
+            var self = this;
+            $(self.$el).datepicker({
+                format: "dd/mm/yyyy",
+                autoclose: false,
+                todayHighlight: true,
+                language: 'th-th',
+            });
+
+            $(self.$el).change(function () {
+                self.$emit('input', _isNull($(this).val()) ? null : $(this).val());
+            });
+
+            $(this.$el).datepicker('setDate', _isNull(self.value) ? null : self.value);
+
+            self.setStartDate(self.startdate);
+            self.setEndDate(self.enddate);
+        },
+        watch: {
+            startdate: function (startdate) {
+                this.setStartDate(startdate);
+            },
+            enddate: function (enddate) {
+                this.setEndDate(enddate);
+            },
+            value: function (newValue, oldValue) {
+                $(this.$el).datepicker('setDate', _isNull(newValue) ? null : newValue);
+            }
+        },
+        methods: {
+            setStartDate: function (startdate) {
+                if (!_isNull(startdate)) {
+                    $(this.$el).datepicker('setStartDate', startdate);
+                } else {
+                    $(this.$el).datepicker('setStartDate', false);
+                }
+            },
+            setEndDate: function (enddate) {
+                if (!_isNull(enddate)) {
+                    $(this.$el).datepicker('setEndDate', enddate);
+                } else {
+                    $(this.$el).datepicker('setEndDate', false);
+                }
+            }
+        },
+        destroy() {
+            this.$destroy();
+        }
+    });
+</script>

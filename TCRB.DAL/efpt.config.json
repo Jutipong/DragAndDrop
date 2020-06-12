@@ -1,0 +1,31 @@
+﻿{
+   "ContextClassName": "ConfigurationManagementContext",
+   "ContextNamespace": "",
+   "DefaultDacpacSchema": null,
+   "DoNotCombineNamespace": false,
+   "IdReplace": false,
+   "IncludeConnectionString": true,
+   "ModelNamespace": null,
+   "OutputContextPath": "ConfigurationManagementContext",
+   "OutputPath": "EntityModel",
+   "ProjectRootNamespace": "TCRB.DAL",
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "Tables": [
+      {
+         "HasPrimaryKey": true,
+         "Name": "[dbo].[ConfigurationDetail]"
+      },
+      {
+         "HasPrimaryKey": true,
+         "Name": "[dbo].[ConfigurationMaster]"
+      }
+   ],
+   "UseDatabaseNames": true,
+   "UseDbContextSplitting": false,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseInflector": false,
+   "UseLegacyPluralizer": false,
+   "UseSpatial": false
+}

@@ -1,0 +1,247 @@
+﻿@using System.Text.Json
+@model TCRB.WEB.Models.Demo01ViewModel
+@{
+    ViewData["Title"] = "Demo01";
+}
+
+<div id="demo01">
+    <div class="ibox ">
+        <div class="ibox-title">
+            <h5><i class="fa fa-search"></i> Search</h5>
+            <div class="ibox-tools">
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+            </div>
+        </div>
+        <div class="ibox-content">
+
+
+            <form id="form_inquiry" class="form-horizontal" action="javascript:;" method="POST">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Name</label>
+                            <div class="col-md-9">
+                                <input type="text" name="Name" class="form-control" v-model="req.Name" placeholder="Name" autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">DateTime1</label>
+                            <div class="col-md-9">
+                                <div class="input-group date">
+                                    <datepicker-component name="StartDate"
+                                                          :enddate="req.EndDate"
+                                                          v-model="req.StartDate">
+                                    </datepicker-component>
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Select Single</label>
+                            <div class="col-md-9">
+                                <select2-single :placeholder="'select2-single'"
+                                                :allowclear="true"
+                                                :name="'select2-single'"
+                                                :options="option_master_single"
+                                                :defaultselected="false"
+                                                v-model="data_master_single"
+                                                v-bind:disabled="false">
+                                </select2-single>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Select Ajax</label>
+                            <div class="col-md-9">
+                                <select2-single-ajax :placeholder="''"
+                                                     :name="''"
+                                                     :url_option="'@Url.Action("InquirySelect2")'"
+                                                     :init_data="{ id: 'text_2', text: 'text_2'}"
+                                                     v-model="data_master_single_ajax">
+                                </select2-single-ajax>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Last</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="Last" v-model="req.Last" placeholder="Last" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">DateTime2</label>
+                            <div class="col-md-9">
+                                <div class="input-group date">
+                                    <datepicker-component name="EndDate"
+                                                          :startdate="req.StartDate"
+                                                          v-model="req.EndDate">
+                                    </datepicker-component>
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Select multiple</label>
+                            <div class="col-md-9">
+                                <select2-multiple :disabled="false"
+                                                  :name="'select2multiple'"
+                                                  :options="option_master_multiple"
+                                                  :defaultselected="false"
+                                                  v-model="data_master_multiple">
+                                </select2-multiple>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Input Number</label>
+                            <div class="col-md-9">
+                                <input-number :disabled="false"
+                                              :name="''"
+                                              :precision="2"
+                                              :maxvalue="0"
+                                              v-model="Amount">
+                                </input-number>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group row pull-right">
+                            <div class="col-md-12">
+                                <button class="btn btn-w-m btn-primary btn-sm" type="submit"><i class="fa fa-search"></i> Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5 id="titleMessage"></h5>
+                    <div class="ibox-tools">
+                        <button class="btn btn-w-m btn-success btn-sm" type="submit"><i class="fa fa-plus"></i> Create</button>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="material-datatables table-responsive" id="div_dataTables_Batch"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+
+    @await Html.PartialAsync("~/Views/_VueComponent/_DatepickerComponent.cshtml")
+    @await Html.PartialAsync("~/Views/_VueComponent/_Select2SingleComponent.cshtml")
+    @await Html.PartialAsync("~/Views/_VueComponent/_Select2SingleAjaxComponent.cshtml")
+    @await Html.PartialAsync("~/Views/_VueComponent/_Select2MultipleComponent.cshtml")
+    @await Html.PartialAsync("~/Views/_VueComponent/_NumberComponent.cshtml")
+
+    <script type="text/javascript">
+        //=====================================
+        //========== Global variable ==========
+        //=====================================
+        let tableSearch;
+        //=====================================
+        //=============== Vue. ================
+        //=====================================
+        var demo01 = new Vue({
+            el: '#demo01',
+            data: function () {
+                return {
+                    //=============== Data ================
+                    req: {
+                        StartDate: null,
+                        EndDate: null,
+                        Name: null,
+                        Last: null
+                    },
+                    //=============== Model ===============
+                    //============= Template ==============
+
+                    //============= Select2 ==============
+                    option_master_single:  @Html.Raw(JsonSerializer.Serialize(Model.Master_Select2Single)),
+                    option_master_multiple:  @Html.Raw(JsonSerializer.Serialize(Model.Master_Select2Multiple)),
+                    data_master_single: 'id_4',
+                    data_master_single_ajax: null,
+                    data_master_multiple: [],
+                    Amount: null,
+                }
+            },
+            methods: {
+                inquiry_data: function () {
+                    let self = this;
+                    _ajax(_Config.AjaxType.Post, '@Url.Action("InquiryData")', self.req, function (res) {
+                        console.log(res);
+                    });
+                }
+            },
+            beforeMount() { },
+            mounted() {
+                let self = this;
+                _submitForm($('#form_inquiry'), () => {
+                    table_Search.fnDraw();
+                });
+
+                //========== Data Table ==========
+                table_Search = _dataTable("#div_dataTables_Batch", "dataTables_Batch", "form_inquiry",
+                    {
+                        url: '@Url.Action("InquiryDataTableUser")',
+                        columns: [
+                            { title: "Code", data: "Code", sClass: "text-center" },
+                            { title: "Name", data: "Name", sClass: "text-center" },
+                            { title: "Last", data: "Last", sClass: "text-center", bSortable: true },
+                            {
+                                title: "CreateDate",
+                                data: "CreateDate",
+                                sClass: "text-center",
+                                bSortable: true,
+                                render: (o) => { return _Filter.DateTime.DDMMYYYY(o) }
+                            },
+                            { title: "CreateBy", data: "CreateBy", sClass: "text-center", bSortable: true },
+                        ],
+                        order: [[1, _Config.DataTable.DESC]],
+                        autoRow: true,
+                        btnAction: true,
+                        btnEdit: true,
+                        btnDelete: true
+                    },
+                    function () {
+                        console.log("call back");
+                    }).on('click', 'a', 'tr', function () {
+                        let obj = table_Search.fnGetData($(this).parents('tr')[0]);
+                        console.log(obj);
+                        switch ($(this).attr('data-action')) {
+                            case _Enum.Operation.Update.Text:
+                                break;
+                            case _Enum.Operation.Delete.Text:
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+            },
+            filters: {},
+            computed: {},
+            watch: {},
+        });
+    </script>
+}
+

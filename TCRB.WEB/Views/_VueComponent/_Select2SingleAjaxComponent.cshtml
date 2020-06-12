@@ -1,0 +1,101 @@
+﻿<template id="select2-single-ajax-template">
+    <select style="width:100%"> </select>
+</template>
+<script>
+    Vue.component('select2-single-ajax', {
+        template: '#select2-single-ajax-template',
+        props: {
+            url_option: {
+                type: String,
+                default: () => null
+            },
+            placeholder: {
+                type: String,
+                default: () => 'All'
+            },
+            allowclear: {
+                type: Boolean,
+                default: () => true
+            },
+            init_data: {
+                type: Object,
+                default: () => { }
+            },
+            minimum_input: {
+                type: Number,
+                default: () => 6
+            },
+            name: {
+                type: String,
+                default: () => null
+            }
+        },
+        mounted: function () {
+            var self = this;
+
+            if (!_isNull(self.name)) {
+                $(self.$el).attr('name', self.name);
+            }
+
+            $(self.$el).select2({
+                allowClear: true,
+                placeholder: _isNull(self.placeholder) ? 'All' : self.placeholder,
+                minimumInputLength: self.minimum_input,
+                //delay: 90000,
+                language: {
+                    searching: function () {
+                        return "กำลังค้นหา.......";
+                    },
+                    errorLoading: function () {
+                        return "กำลังค้นหา.......";
+                    },
+                    loadingMore: function () {
+                        return "กำลังค้นหา.......";
+                    },
+                    inputTooShort: function (e) {
+                        return `กรุณากรอกอย่างน้อย ${self.minimum_input} ตัวอักษร`;
+                    }, noResults: function () {
+                        return "ไม่พลข้อมูล"
+                    }
+                },
+                ajax: {
+                    type: "POST",
+                    dataType: 'JSON',
+                    async: true,
+                    delay: 1000,
+                    url: self.url_option,
+                    data: function (params) {
+                        return {
+                            Search: params.term,
+                            Page: params.page || 1
+                        }
+                    },
+                    processResults: function (response) {
+                        return { results: response };
+                    },
+                }
+            }).on('change', function () {
+                self.$emit('input', $(this).val());
+            });
+
+            if (!_isNull(self.init_data) && !_isNull(self.init_data.id) && _isNull(self.init_data.text)) {
+                $(self.$el).append(new Option(self.init_data.id, self.init_data.text, false, false)).trigger('change');
+            }
+        },
+        //computed: {
+        //    _minimumInputLength: function () {
+        //        debugger;
+        //        return this.minimumInput;
+        //    },
+        //},
+        //watch: {
+        //    _minimumInputLength: function (val) {
+        //        this.minimumInputLength = val;
+        //        console.log(this.minimumInputLength);
+        //    },
+        //},
+        //destroyed: function () {
+        //    $(this.$el).off().select2('destroy')
+        //}
+    });
+</script>

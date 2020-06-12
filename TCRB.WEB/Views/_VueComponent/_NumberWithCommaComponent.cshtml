@@ -1,0 +1,86 @@
+﻿<template id="input-number-template">
+    <input class="form-control" type="text" v-model="amount" v-on:change="emitValue" v-on:blur="handleBlur" />
+</template>
+
+<script>
+    Vue.component("input-number", {
+        template: "#input-number-template",
+        props: {
+            precision: {
+                type: Number,
+                default: () => 2
+            },
+            value: {
+                default: () => null
+            },
+            maxvalue: {
+                default: () => null
+            }
+        },
+        data: () => ({
+            amount: null
+        }),
+        mounted: function () {
+            var self = this;
+            $(this.$el).number(true, this.precision);
+            if (_.isNumber(this.value)) {
+                if (this.value === 0) {
+                    this.amount = self.getStringDigits();
+                }
+                else if (_isNull(this.value)) {
+                    this.amount = null;
+                }
+                else if (this.value > 0) {
+                    this.amount = $.number(this.value, this.precision);
+                }
+            }
+        },
+        methods: {
+            emitValue: function () {
+                if (!_isNull(this.amount)) {
+                    var strnum = this.amount.replace(/,/g, '');
+                    var numvalue = (parseFloat(strnum));
+                    if (numvalue > this.maxvalue && this.maxvalue != 0) {
+                        this.amount = this.getStringDigits();
+                        this.$emit('input', 0);
+                    }
+                    else if (numvalue < 0) {
+                        this.amount = 0;
+                        this.$emit('input', 0);
+                    } else {
+                        this.$emit('input', numvalue);
+                    }
+                }
+            },
+            getStringDigits: function () {
+                let digitstr = "0.";
+                for (let i = 0; i < this.precision; i++) {
+                    digitstr += "0";
+                }
+                return digitstr;
+            },
+            handleBlur: function () {
+                if ($(this.$el).val() === '') {
+                    this.amount = null;
+                    this.$emit('input', null);
+                }
+            }
+        },
+        watch: {
+            value(newValue) {
+                if (newValue === 0) {
+                    let digitstr = "0.";
+                    for (let i = 0; i < this.precision; i++) {
+                        digitstr += "0";
+                    }
+                    this.amount = digitstr;
+                    $(this.$el).val(this.value);
+                }
+                if (_isNull(newValue)) {
+                    this.amount = null;
+                    $(this.$el).val(null);
+                }
+            }
+        }
+    });
+</script>
