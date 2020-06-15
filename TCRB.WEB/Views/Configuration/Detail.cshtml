@@ -24,7 +24,7 @@
     @await Html.PartialAsync("~/Views/_VueComponent/_Select2SingleComponent.cshtml")
     @await Html.PartialAsync("~/Views/Configuration/Components/DragDropDetail.cshtml")
 
-<script type="text/javascript">
+    <script type="text/javascript">
         //=====================================
         //========== Global variable ==========
         //=====================================
@@ -44,7 +44,7 @@
                     detailListModel:  @Html.Raw(JsonSerializer.Serialize(new List<ConfigurationDetail>())),
                     //=============== Data ================
                     master:@Html.Raw(Json.Serialize(Model)),
-                    detailList: @Html.Raw(JsonSerializer.Serialize(new List<ConfigurationDetail>())),// self.onLoadDetail(@Html.Raw(Json.Serialize(Model.ID))),
+                    detailList: [], //self.onLoadDetail(@Html.Raw(Json.Serialize(Model.ID))),
                     //============= Template ==============
                 }
             },
@@ -53,48 +53,40 @@
                     let self = this;
                     _ajax(_Config.AjaxType.Post, '@Url.Action("InquiryDetail")', { masterID: id }, true, function (res) {
                         if (res.Success) {
-                            Vue.set(self, 'detailList', _.forEach(res.Datas, (item) => { item.isEdit = false; }));
+                            Vue.set(self, 'detailList', _.forEach(res.Datas, (item) => {
+                                item.isEdit = false;
+                                item.Required = _isNull(item.Required) ? 'false' : item.Required.toString(); 
+                            }));
                         } else {
                             self.lists = [];
                             _toastrError(res.Message);
                         }
                     });
                 },
-                onSave(objs) {
+                onSave(detail) {
                     let self = this;
-                    debugger;
-                    _.forEach(objs, (item) => { item.ConfigurationID = self.master.ID; });
-
-                    _ajax(_Config.AjaxType.Post, '@Url.Action("CreateDetail")', objs, true, function (res) {
-                        if (res.Success) {
-
-                        } else {
-                            _toastrError(_Enum.Message.SaveFail);
-                        }
-                    });
-
-
-                    @*_ajax(_Config.AjaxType.Post, '@Url.Action("CreateDetail")', objs, true, function (res) {
+                    _.forEach(detail, (item) => { item.ConfigurationID = self.master.ID; });
+                    _ajax(_Config.AjaxType.Post, '@Url.Action("CreateDetail")', {detail}, true, function (res) {
                         if (res.Success) {
                             _toastrSuccess(_Enum.Message.SaveSuccess);
                             //Reload detailLists data.
-                            self.onLoadDetail();
+                            self.onLoadDetail(self.master.ID);
                         } else {
                             self.lists = [];
                             _toastrError(res.Message);
                         }
-                    });*@
+                    });
                 }
             },
             beforeMount() { },
             mounted() {
                 let self = this;
-                self.onLoadDetail();
+                self.onLoadDetail(self.master.ID);
             },
             filters: {},
             computed: {
             },
             watch: {},
         });
-</script>
+    </script>
 }

@@ -36,6 +36,7 @@ namespace TCRB.WEB
         {
             services.AddOptions();
             services.AddControllersWithViews();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddLogging(builder => { builder.AddFilter("Microsoft", LogLevel.None).AddFilter(nameof(System), LogLevel.Warning); });
             services.Configure<AppsittingModel>(Configuration.GetSection("AppSettings"));
             services.AddDbContext<TCRBDBContext>();

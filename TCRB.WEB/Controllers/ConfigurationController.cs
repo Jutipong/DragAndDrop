@@ -10,6 +10,7 @@ using TCRB.DAL.EntityModel;
 using TCRB.DAL.Model.Authentication;
 using TCRB.DAL.Model.Commons;
 using TCRB.DAL.Model.Configuration;
+using TCRB.HELPER;
 using TCRB.WEB.Models;
 
 namespace TCRB.WEB.Controllers
@@ -48,15 +49,15 @@ namespace TCRB.WEB.Controllers
 
         public JsonResult Create(ConfigurationMaster master)
         {
-            master.CreateDate = DateTime.Now;
             master.CreateBy = UserLogin.User().UserID;
+            master.CreateDate = DateTime.Now;
             var result = _configurationDataService.Create(master);
             return Json(result);
         }
         public JsonResult Update(ConfigurationMaster master)
         {
-            master.UpdateDate = DateTime.Now;
             master.UpdateBy = UserLogin.User().UserID;
+            master.UpdateDate = DateTime.Now;
             var result = _configurationDataService.Update(master);
             return Json(result);
         }
@@ -70,8 +71,6 @@ namespace TCRB.WEB.Controllers
         #region Detail
         public ActionResult Detail(Guid id)
         {
-            var result = new ConfigurationModel();
-
             if (id == Guid.Empty)
             {
                 return RedirectToAction("AccessDenied", "Account");
@@ -79,16 +78,13 @@ namespace TCRB.WEB.Controllers
 
             //Todo _mapper
             var obj = _configurationDataService.InquiryMaster(id);
-            result.ID = obj.ID;
-            result.TemplateName = obj.TemplateName;
-            result.InputFile = obj.InputFile;
-            result.OutputFile = obj.OutputFile;
-            result.CreateBy = obj.CreateBy;
-            result.CreateDate = obj.CreateDate;
-            result.UpdateBy = obj.UpdateBy;
-            result.UpdateDate = obj.UpdateDate;
-            result.IsActive = obj.IsActive;
 
+            if (obj == null)
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+
+            var result = _mapper.Map<ConfigurationModel>(obj);
             return View(result);
         }
 
@@ -98,49 +94,89 @@ namespace TCRB.WEB.Controllers
             return Json(result);
         }
 
-        public JsonResult CreateDetail(List<ConfigurationDetail2> detail)
+        public JsonResult CreateDetail(List<ConfigurationDetail> detail)
         {
-            var createDate = DateTime.Now;
-            var createBy = UserLogin.User().UserID;
-            //detail.ForEach(item =>
-            //{
-            //    item.CreateDate = DateTime.Now;
-            //    item.CreateBy = createBy;
-            //});
-            var result = _configurationDataService.CreateDetail(new List<ConfigurationDetail>());
-            return Json(result);
-        }
-        public JsonResult UpdateDetail(ConfigurationDetail detail)
-        {
-            detail.UpdateDate = DateTime.Now;
-            detail.UpdateBy = UserLogin.User().UserID;
-            var result = _configurationDataService.UpdateDetail(detail);
-            return Json(result);
-        }
-        public JsonResult DeleteDetail(ConfigurationDetail detail)
-        {
-            var result = _configurationDataService.DeleteDetail(detail);
+            var resultCreate = new ResponseModel();
+            var resultUpdate = new ResponseModel();
+            var resultDelete = new ResponseModel();
+
+            //แยก create, update, delete
+            var creates = detail.Where(r => r.ID == Guid.Empty).ToList();
+            var updates = detail.Where(r => r.ID != Guid.Empty).ToList();
+            var deletes = updates.Select(r => r.ID).ToList();
+
+            var dateNow = DateTime.Now;
+            var userBy = UserLogin.User().UserID;
+
+            #region Delete
+            if (deletes.Any())
+            {
+                var masterID = detail.FirstOrDefault(r => r.ConfigurationID != Guid.Empty).ConfigurationID;
+                if (masterID != null)
+                {
+                    resultDelete = _configurationDataService.DeleteDetail(masterID, deletes);
+                }
+
+                if (!resultDelete.Success || masterID == null)
+                {
+                    resultUpdate.Message = "Delete ConfigulationDetail Fail.";
+                    return Json(resultDelete);
+                }
+            }
+            else
+            {
+                resultDelete.Success = true;
+            }
+            #endregion
+
+            #region Update
+            if (updates.Any())
+            {
+                updates.ForEach(r => { r.UpdateDate = dateNow; r.UpdateBy = userBy; });
+                resultUpdate = _configurationDataService.UpdateDetail(updates);
+
+                if (!resultUpdate.Success)
+                {
+                    resultUpdate.Message = "Update ConfigulationDetail Fail.";
+                    return Json(resultUpdate);
+                }
+            }
+            else
+            {
+                resultUpdate.Success = true;
+            }
+            #endregion
+
+            #region Create
+            if (creates.Any())
+            {
+                creates.ForEach(r => { r.CreateDate = dateNow; r.CreateBy = userBy; });
+                resultCreate = _configurationDataService.CreateDetail(creates);
+
+                if (!resultCreate.Success)
+                {
+                    resultCreate.Message = "Create ConfigulationDetail Fail.";
+                    return Json(resultCreate);
+                }
+            }
+            else
+            {
+                resultCreate.Success = true;
+            }
+            #endregion
+
+            var IsSuccess = resultCreate.Success && resultUpdate.Success && resultDelete.Success;
+            var result = new ResponseModel
+            {
+                Success = IsSuccess,
+                Message = IsSuccess
+                ? EnumHttpStatus.SUCCESS.AsDescription()
+                : EnumHttpStatus.INTERNAL_SERVER_ERROR.AsDescription()
+            };
+
             return Json(result);
         }
         #endregion
 
-    }
-
-    public class ConfigurationDetail2
-    {
-        //public Guid ID { get; set; }
-        //public Guid ConfigurationID { get; set; }
-        public string FieldName { get; set; }
-        //public string Type { get; set; }
-        //public bool Required { get; set; }
-        //public int Length { get; set; }
-        //public int Len { get; set; }
-        //public int Des { get; set; }
-        //public int Order { get; set; }
-        //public DateTime? CreateDate { get; set; }
-        //public string CreateBy { get; set; }
-        //public DateTime? UpdateDate { get; set; }
-        //public string UpdateBy { get; set; }
-        //public bool? IsActive { get; set; }
     }
 }

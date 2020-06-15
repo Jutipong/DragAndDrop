@@ -25,7 +25,7 @@ namespace TCRB.WEB.ModelBinder
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (!context.Metadata.IsComplexType && context.Metadata.ModelType == typeof(DateTime?)) // only encode string types
+            if (!context.Metadata.IsComplexType && (context.Metadata.ModelType == typeof(DateTime?)) || context.Metadata.ModelType == typeof(DateTime)) // only encode string types
             {
                 return new ModelBinderDateTime(new SimpleTypeModelBinder(context.Metadata.ModelType, _logger));
             }

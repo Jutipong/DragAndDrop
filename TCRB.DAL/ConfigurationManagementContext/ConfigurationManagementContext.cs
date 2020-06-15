@@ -35,45 +35,11 @@ namespace TCRB.DAL.ConfigurationManagementContext
             modelBuilder.Entity<ConfigurationDetail>(entity =>
             {
                 entity.Property(e => e.ID).HasDefaultValueSql("(newsequentialid())");
-
-                entity.Property(e => e.CreateBy)
-                    .IsRequired()
-                    .HasMaxLength(200);
-
-                entity.Property(e => e.CreateDate).HasColumnType("datetime");
-
-                entity.Property(e => e.FieldName)
-                    .IsRequired()
-                    .HasMaxLength(100);
-
-                entity.Property(e => e.Type)
-                    .IsRequired()
-                    .HasMaxLength(100);
-
-                entity.Property(e => e.UpdateBy).HasMaxLength(200);
-
-                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<ConfigurationMaster>(entity =>
             {
                 entity.Property(e => e.ID).HasDefaultValueSql("(newsequentialid())");
-
-                entity.Property(e => e.CreateBy)
-                    .IsRequired()
-                    .HasMaxLength(200);
-
-                entity.Property(e => e.CreateDate).HasColumnType("datetime");
-
-                entity.Property(e => e.OutputFile).IsRequired();
-
-                entity.Property(e => e.TemplateName)
-                    .IsRequired()
-                    .HasMaxLength(200);
-
-                entity.Property(e => e.UpdateBy).HasMaxLength(200);
-
-                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             });
 
             OnModelCreatingPartial(modelBuilder);

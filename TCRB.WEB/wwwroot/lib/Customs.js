@@ -233,6 +233,8 @@ const _ajax = ($type, $url, $objs, $isBlockUi, callback) => {
         cache: false,
         url: $url,
         dataType: "json",
+        //traditional: true,
+        //contentType: 'application/json',
         data: $objs,
         success(res) {
             if (callback) {

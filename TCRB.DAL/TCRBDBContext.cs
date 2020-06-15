@@ -23,6 +23,7 @@ namespace TCRB.DAL
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseSqlServer(_configuration.ConnectionStrings.TCRBDB);
+                //optionsBuilder.EnableSensitiveDataLogging(false);
             }
         }
     }

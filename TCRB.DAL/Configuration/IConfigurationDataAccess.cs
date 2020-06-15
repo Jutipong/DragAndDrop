@@ -14,8 +14,8 @@ namespace TCRB.DAL.Configuration
         ResponseModel Update(ConfigurationMaster master);
         ResponseModel Delete(ConfigurationMaster master);
         List<ConfigurationDetail> InquiryDetail(Guid masterID);
-        ResponseModel CreateDetail(List<ConfigurationDetail> detail);
-        ResponseModel UpdateDetail(ConfigurationDetail detail);
-        ResponseModel DeleteDetail(ConfigurationDetail detail);
+        ResponseModel CreateDetail(List<ConfigurationDetail> details);
+        ResponseModel UpdateDetail(List<ConfigurationDetail> details);
+        ResponseModel DeleteDetail(Guid masterID, List<Guid> detailsID);
     }
 }

@@ -189,7 +189,7 @@ namespace TCRB.BAL
             return response;
         }
 
-        public ResponseModel UpdateDetail(ConfigurationDetail detail)
+        public ResponseModel UpdateDetail(List<ConfigurationDetail> detail)
         {
             var response = new ResponseModel();
 
@@ -210,14 +210,14 @@ namespace TCRB.BAL
             return response;
         }
 
-        public ResponseModel DeleteDetail(ConfigurationDetail detail)
+        public ResponseModel DeleteDetail(Guid masterID, List<Guid> detailsID)
         {
             var response = new ResponseModel();
 
             try
             {
-                _logger.LogInformation($"Start => {MethodBase.GetCurrentMethod().Name}", JsonSerializer.Serialize(detail));
-                var result = _dataAccess.ConfigurationDataAccess.DeleteDetail(detail);
+                _logger.LogInformation($"Start => {MethodBase.GetCurrentMethod().Name}", JsonSerializer.Serialize(detailsID));
+                var result = _dataAccess.ConfigurationDataAccess.DeleteDetail(masterID, detailsID);
                 _logger.LogInformation($"Finish => {MethodBase.GetCurrentMethod().Name}", JsonSerializer.Serialize(result));
 
                 response.Datas = result;

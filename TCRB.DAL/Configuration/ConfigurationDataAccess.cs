@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +15,13 @@ namespace TCRB.DAL.Configuration
     public class ConfigurationDataAccess : IConfigurationDataAccess
     {
         private readonly TCRBDBContext _context;
+        private readonly IMapper _mapper;
         private readonly ILogger<ConfigurationDataAccess> _logger;
 
-        public ConfigurationDataAccess(TCRBDBContext context, ILoggerFactory loggerFactory)
+        public ConfigurationDataAccess(TCRBDBContext context, ILoggerFactory loggerFactory, IMapper mapper)
         {
             _logger = loggerFactory.CreateLogger<ConfigurationDataAccess>();
+            _mapper = mapper;
             _context = context;
         }
 
@@ -166,16 +171,10 @@ namespace TCRB.DAL.Configuration
 
             try
             {
-                var master = _context.ConfigurationMaster.FirstOrDefault(master => master.ID == configurationMaster.ID);
-                if (master != null)
+                if (_context.ConfigurationMaster.Any(master => master.ID == configurationMaster.ID))
                 {
                     _logger.LogInformation($"Start => Update value ConfiguartionMaster");
-                    master.TemplateName = configurationMaster.TemplateName;
-                    master.InputFile = configurationMaster.InputFile;
-                    master.OutputFile = configurationMaster.OutputFile;
-                    master.IsActive = configurationMaster.IsActive;
-                    master.UpdateDate = configurationMaster.UpdateDate;
-                    master.UpdateBy = configurationMaster.UpdateBy;
+                    _context.ConfigurationMaster.Update(configurationMaster);
                     _logger.LogInformation($"Finish => Update value ConfiguartionMaster");
 
                     _logger.LogInformation($"Start => SaveChange");
@@ -248,14 +247,14 @@ namespace TCRB.DAL.Configuration
             return result;
         }
 
-        public ResponseModel CreateDetail(List<ConfigurationDetail> detail)
+        public ResponseModel CreateDetail(List<ConfigurationDetail> details)
         {
             var response = new ResponseModel();
 
             try
             {
                 _logger.LogInformation($"Start => Insert ConfiguartionDetail");
-                _context.ConfigurationDetail.AddRange(detail);
+                _context.ConfigurationDetail.AddRange(details);
                 _logger.LogInformation($"Finish => Insert ConfiguartionDetail");
 
                 _logger.LogInformation($"Start => SaveChange");
@@ -273,36 +272,60 @@ namespace TCRB.DAL.Configuration
             return response;
         }
 
-        public ResponseModel UpdateDetail(ConfigurationDetail detail)
+        public ResponseModel UpdateDetail(List<ConfigurationDetail> details)
         {
             var response = new ResponseModel();
 
             try
             {
-                var entity = _context.ConfigurationDetail.FirstOrDefault(item => item.ID == detail.ID);
-                if (entity != null)
+                details.ForEach(detail =>
                 {
-                    _logger.LogInformation($"Start => Update value ConfiguartionDetail");
-                    entity.FieldName = detail.FieldName;
-                    entity.Type = detail.Type;
-                    entity.Required = detail.Required;
-                    entity.Length = detail.Length;
-                    entity.Len = detail.Len;
-                    entity.Des = detail.Des;
-                    entity.UpdateDate = DateTime.Now;
-                    entity.UpdateBy = detail.UpdateBy;
-                    _logger.LogInformation($"Finish => Update value ConfiguartionDetail");
+                    if (_context.ConfigurationDetail.Any(r => r.ID == detail.ID))
+                    {
+                        _logger.LogInformation($"Start => Update value ConfiguartionDetail ID: {detail.ID}");
+                        _context.Update(detail);
+                        _logger.LogInformation($"Finish => Update value ConfiguartionDetail ID: {detail.ID}");
+                    }
+                    else
+                    {
+                        _logger.LogInformation($"Inquiry => ConfiguartionDetail Data no found ID: {detail.ID}");
+                    }
+                });
 
-                    _logger.LogInformation($"Start => SaveChange");
-                    _context.SaveChanges();
-                    _logger.LogInformation($"Finish => SaveChange");
+                _context.SaveChanges();
 
-                    response.Success = true;
-                }
-                else
-                {
-                    _logger.LogInformation($"Inquiry => ConfiguartionDetail Data no found.");
-                }
+
+
+
+                //details.ForEach(item =>
+                //{
+                //    var entity = _context.ConfigurationDetail.FirstOrDefault(r => r.ID == item.ID);
+                //    if (entity != null)
+                //    {
+                //        _logger.LogInformation($"Start => Update value ConfiguartionDetail ID: {item.ID}");
+                //        entity.Order = item.Order;
+                //        entity.FieldName = item.FieldName;
+                //        entity.Type = item.Type;
+                //        entity.Required = item.Required;
+                //        entity.Length = item.Length;
+                //        entity.Len = item.Len;
+                //        entity.Des = item.Des;
+                //        entity.UpdateDate = DateTime.Now;
+                //        entity.UpdateBy = item.UpdateBy;
+                //        _logger.LogInformation($"Finish => Update value ConfiguartionDetail ID: {item.ID}");
+
+                //        _logger.LogInformation($"Start => SaveChange ID: {item.ID}");
+                //        _context.SaveChanges();
+                //        _logger.LogInformation($"Finish => SaveChange ID: {item.ID}");
+
+                //    }
+                //    else
+                //    {
+                //        _logger.LogInformation($"Inquiry => ConfiguartionDetail Data no found ID: {item.ID}");
+                //    }
+                //});
+
+                response.Success = true;
             }
             catch (Exception ex)
             {
@@ -313,14 +336,14 @@ namespace TCRB.DAL.Configuration
             return response;
         }
 
-        public ResponseModel DeleteDetail(ConfigurationDetail detail)
+        public ResponseModel DeleteDetail(Guid masterID, List<Guid> detailsID)
         {
             var response = new ResponseModel();
 
             try
             {
                 _logger.LogInformation($"Start => Delete ConfiguartionDetail");
-                _context.ConfigurationDetail.Remove(_context.ConfigurationDetail.FirstOrDefault(r => r.ID == detail.ID));
+                _context.ConfigurationDetail.RemoveRange(_context.ConfigurationDetail.Where(r => r.ConfigurationID == masterID && !detailsID.Contains(r.ID)));
                 _logger.LogInformation($"Finish => Delete ConfiguartionDetail");
 
                 _logger.LogInformation($"Start => SaveChange");
