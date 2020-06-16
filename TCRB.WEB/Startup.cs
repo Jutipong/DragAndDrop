@@ -13,7 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using TCRB.BAL;
+using TCRB.BLL;
 using TCRB.DAL;
 using TCRB.DAL.Model.Appsetting;
 using TCRB.WEB.Helpers;
@@ -41,6 +41,8 @@ namespace TCRB.WEB
             services.Configure<AppsittingModel>(Configuration.GetSection("AppSettings"));
             services.AddDbContext<TCRBDBContext>();
             services.AddScoped<ConfigurationDataService>();
+            services.AddScoped<UserLogin>();
+            services.AddHttpContextAccessor();
             services.AddScoped<IDataAccessWrapper, DataAccessWrapper>();
 
 
@@ -62,7 +64,7 @@ namespace TCRB.WEB
                 };
             });
 
-            services.AddScoped<IDataAccessWrapper, DataAccessWrapper>();
+            //services.AddScoped<IDataAccessWrapper, DataAccessWrapper>();
             services.AddAutoMapper(typeof(Startup));
             services.AddControllersWithViews();
 

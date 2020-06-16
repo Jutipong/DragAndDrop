@@ -294,37 +294,6 @@ namespace TCRB.DAL.Configuration
 
                 _context.SaveChanges();
 
-
-
-
-                //details.ForEach(item =>
-                //{
-                //    var entity = _context.ConfigurationDetail.FirstOrDefault(r => r.ID == item.ID);
-                //    if (entity != null)
-                //    {
-                //        _logger.LogInformation($"Start => Update value ConfiguartionDetail ID: {item.ID}");
-                //        entity.Order = item.Order;
-                //        entity.FieldName = item.FieldName;
-                //        entity.Type = item.Type;
-                //        entity.Required = item.Required;
-                //        entity.Length = item.Length;
-                //        entity.Len = item.Len;
-                //        entity.Des = item.Des;
-                //        entity.UpdateDate = DateTime.Now;
-                //        entity.UpdateBy = item.UpdateBy;
-                //        _logger.LogInformation($"Finish => Update value ConfiguartionDetail ID: {item.ID}");
-
-                //        _logger.LogInformation($"Start => SaveChange ID: {item.ID}");
-                //        _context.SaveChanges();
-                //        _logger.LogInformation($"Finish => SaveChange ID: {item.ID}");
-
-                //    }
-                //    else
-                //    {
-                //        _logger.LogInformation($"Inquiry => ConfiguartionDetail Data no found ID: {item.ID}");
-                //    }
-                //});
-
                 response.Success = true;
             }
             catch (Exception ex)

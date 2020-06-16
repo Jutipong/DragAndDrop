@@ -205,6 +205,7 @@
                                 if (res.Success) {
                                     self.configuration = _.cloneDeep(self.configurationViewModel);
                                     self.configuration.IsActive = 'true';
+
                                     //Reload DataTable.
                                     self.onSubmit();
                                     _toastrSuccess(_Enum.Message.SaveSuccess);
@@ -303,8 +304,7 @@
                     return _Enum.GuidEmpty === this.configuration.ID;
                 },
                 actionBtnSave() {
-                    let self = this;
-                    return (_isNull(self.configuration.TemplateName) || _isNull(self.configuration.InputFile) || _isNull(self.configuration.OutputFile));
+                    return (_isNull(this.configuration.TemplateName) || _isNull(this.configuration.InputFile) || _isNull(this.configuration.OutputFile));
                 }
             },
             watch: {},

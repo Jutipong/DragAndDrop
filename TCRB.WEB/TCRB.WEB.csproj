@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TCRB.BAL\TCRB.BAL.csproj" />
+    <ProjectReference Include="..\TCRB.BLL\TCRB.BLL.csproj" />
     <ProjectReference Include="..\TCRB.HELPER\TCRB.HELPER.csproj" />
   </ItemGroup>
 

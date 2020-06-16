@@ -7,9 +7,9 @@ using TCRB.DAL.Model.UserLogin;
 
 namespace TCRB.WEB
 {
-    public static class UserLogin
+    public class UserLogin
     {
-        public static UserProfileModel User()
+        public UserProfileModel UserProfile()
         {
             var userCurrent = HttpContext.Current.User;
             var userJson = userCurrent.Claims.Where(u => u.Type == ClaimTypes.Sid).Select(r => r.Value).FirstOrDefault();

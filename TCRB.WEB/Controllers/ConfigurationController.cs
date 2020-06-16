@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TCRB.BAL;
+using TCRB.BLL;
 using TCRB.DAL.EntityModel;
 using TCRB.DAL.Model.Authentication;
 using TCRB.DAL.Model.Commons;
@@ -21,12 +22,16 @@ namespace TCRB.WEB.Controllers
         private ConfigurationDataService _configurationDataService;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
+        private readonly UserProfileModel _userProfile;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ConfigurationController(ConfigurationDataService configurationDataService, ILogger<ConfigurationController> logger, IMapper mapper)
+        public ConfigurationController(ConfigurationDataService configurationDataService, ILogger<ConfigurationController> logger, IMapper mapper, UserLogin userLogin, IHttpContextAccessor httpContextAccessor)
         {
             _configurationDataService = configurationDataService;
             _mapper = mapper;
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
+            _userProfile = userLogin.UserProfile();
         }
 
         #region Master
@@ -49,14 +54,14 @@ namespace TCRB.WEB.Controllers
 
         public JsonResult Create(ConfigurationMaster master)
         {
-            master.CreateBy = UserLogin.User().UserID;
+            master.CreateBy = _userProfile.UserID;
             master.CreateDate = DateTime.Now;
             var result = _configurationDataService.Create(master);
             return Json(result);
         }
         public JsonResult Update(ConfigurationMaster master)
         {
-            master.UpdateBy = UserLogin.User().UserID;
+            master.UpdateBy = _userProfile.UserID;
             master.UpdateDate = DateTime.Now;
             var result = _configurationDataService.Update(master);
             return Json(result);
@@ -76,7 +81,6 @@ namespace TCRB.WEB.Controllers
                 return RedirectToAction("AccessDenied", "Account");
             }
 
-            //Todo _mapper
             var obj = _configurationDataService.InquiryMaster(id);
 
             if (obj == null)
@@ -106,7 +110,7 @@ namespace TCRB.WEB.Controllers
             var deletes = updates.Select(r => r.ID).ToList();
 
             var dateNow = DateTime.Now;
-            var userBy = UserLogin.User().UserID;
+            var userBy = _userProfile.UserID;
 
             #region Delete
             if (deletes.Any())
