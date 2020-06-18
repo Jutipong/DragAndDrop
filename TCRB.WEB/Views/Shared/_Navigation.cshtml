@@ -20,12 +20,13 @@
                     IN+
                 </div>
             </li>
-            @{ var controllerList = new List<string> { "Home", "Configuration" };}
+            @{ var controllerList = new List<string> { "Home", "Configuration", "Demo" };}
             <li class="@Html.IsSelected(controller:controllerList )">
                 <a href="@Url.Action("Example", "Home")"><i class="fa fa-wrench"></i> <span class="nav-label" data-i18n="nav.dashboard">Configuration</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse @Html.IsSelected(controller:controllerList), cssClass: " in")">
                     @*<li class="@Html.IsSelected(controller:controllerList, action: "Demo01")"><a href="@Url.Action("Demo01", "Home")">Demo01</a></li>*@
                     <li class="@Html.IsSelected(controller:controllerList, action: "Index")"><a href="@Url.Action("Index", "Configuration")"><i class="fa fa-file-excel-o"></i> Template File</a></li>
+                    <li class="@Html.IsSelected(controller:controllerList, action: "VueTable")"><a href="@Url.Action("VueTable", "Demo")">Vue-Table</a></li>
                 </ul>
             </li>
         </ul>

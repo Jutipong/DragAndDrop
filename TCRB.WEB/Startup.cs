@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -37,15 +36,17 @@ namespace TCRB.WEB
             services.AddOptions();
             services.AddControllersWithViews();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            services.AddLogging(builder => { builder.AddFilter("Microsoft", LogLevel.None).AddFilter(nameof(System), LogLevel.Warning); });
+            services.AddLogging(builder =>
+            {
+                builder.AddFilter("Microsoft", LogLevel.None).AddFilter(nameof(System), LogLevel.Warning);
+            });
             services.Configure<AppsittingModel>(Configuration.GetSection("AppSettings"));
             services.AddDbContext<TCRBDBContext>();
+            //services.AddScoped(typeof(ILoggerHelper<>), typeof(LoggerHelper<>));
             services.AddScoped<ConfigurationDataService>();
             services.AddScoped<UserLogin>();
             services.AddHttpContextAccessor();
             services.AddScoped<IDataAccessWrapper, DataAccessWrapper>();
-
-
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 options.RequestCultureProviders.Clear();
@@ -63,11 +64,8 @@ namespace TCRB.WEB
                     new CultureInfo("en-AU")
                 };
             });
-
-            //services.AddScoped<IDataAccessWrapper, DataAccessWrapper>();
             services.AddAutoMapper(typeof(Startup));
             services.AddControllersWithViews();
-
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = null;

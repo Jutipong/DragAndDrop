@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using TCRB.DAL.EntityModel;
 using TCRB.DAL.Model.Commons;
-using TCRB.DAL.Model.Configuration;
+using TCRB.HELPER;
 
 namespace TCRB.DAL.Configuration
 {
@@ -28,11 +27,12 @@ namespace TCRB.DAL.Configuration
         #region Master
         public DataTableResponseModel InquiryMasterDatatable(DatableOption option, ConfigurationMaster master)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
             var result = new DataTableResponseModel();
 
             try
             {
-                _logger.LogInformation($"Start => Iquiry Inquiry ConfigurationMaster => Datatable");
+                _logger.LogInformation($"Start Function => {methodName}, Parameters => {JsonSerializer.Serialize(master)}");
 
                 var query = _context.ConfigurationMaster
                    .Where(r => (master.ID == Guid.Empty || r.ID == master.ID))
@@ -75,12 +75,13 @@ namespace TCRB.DAL.Configuration
                     recordsFiltered = recordsTotal
                 };
 
-                _logger.LogInformation($"Finish => Iquiry Inquiry ConfigurationMaster => Datatable");
+                _logger.LogInformation($"Finish Function => {methodName}, Result => {JsonSerializer.Serialize(result)}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Fail => {MethodBase.GetCurrentMethod().Name}");
-                throw new ArgumentException("Error: ", ex);
+                var messageError = $"Error Function => {methodName}";
+                _logger.LogError(ex, messageError);
+                throw new ArgumentException(messageError, ex);
             }
 
             return result;
@@ -88,11 +89,13 @@ namespace TCRB.DAL.Configuration
 
         public List<Select2Model> InquiryTemplatename(string Search)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
             var result = new List<Select2Model>();
 
             try
             {
-                _logger.LogInformation($"Start => Iquiry InquiryTemplatename for select2");
+                _logger.LogInformation($"Start Function => {methodName}, Parameters => {JsonSerializer.Serialize(Search)}");
+
                 result = (from cm in _context.ConfigurationMaster.AsEnumerable()
                           where (string.IsNullOrEmpty(Search) || cm.TemplateName.Contains(Search, StringComparison.OrdinalIgnoreCase))
                           select new Select2Model
@@ -106,14 +109,13 @@ namespace TCRB.DAL.Configuration
                     result = result.Where(r => r.text == Search).ToList();
                 }
 
-
-
-                _logger.LogInformation($"Finish => Iquiry InquiryTemplatename for select2");
+                _logger.LogInformation($"Finish Function => {methodName}, Result => {JsonSerializer.Serialize(result)}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Fail => {MethodBase.GetCurrentMethod().Name}");
-                throw new ArgumentException("Error: ", ex);
+                var messageError = $"Error Function => {methodName}";
+                _logger.LogError(ex, messageError);
+                throw new ArgumentException(messageError, ex);
             }
 
             return result;
@@ -121,20 +123,22 @@ namespace TCRB.DAL.Configuration
 
         public ConfigurationMaster InquiryMaster(Guid id)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
             var result = new ConfigurationMaster();
 
             try
             {
-                _logger.LogInformation($"Start => Iquiry Inquiry Configuration Master");
-                var entity = _context.ConfigurationMaster.FirstOrDefault(r => r.ID == id);
-                _logger.LogInformation($"Finish => Iquiry Inquiry Configuration Master");
 
+                _logger.LogInformation($"Start Function => {methodName}, Parameters => {JsonSerializer.Serialize(id)}");
+                var entity = _context.ConfigurationMaster.FirstOrDefault(r => r.ID == id);
                 result = entity;
+                _logger.LogInformation($"Finish Function => {methodName}, Result => {JsonSerializer.Serialize(result)}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Fail => {MethodBase.GetCurrentMethod().Name}");
-                throw new ArgumentException("Error: ", ex);
+                var messageError = $"Error Function => {methodName}";
+                _logger.LogError(ex, messageError);
+                throw new ArgumentException(messageError, ex);
             }
 
             return result;
@@ -142,106 +146,101 @@ namespace TCRB.DAL.Configuration
 
         public ResponseModel Create(ConfigurationMaster master)
         {
-            var response = new ResponseModel();
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            var result = new ResponseModel();
 
             try
             {
-                _logger.LogInformation($"Start => Insert ConfiguartionMaster");
+                _logger.LogInformation($"Start Function => {methodName}, Parameters => {JsonSerializer.Serialize(master)}");
                 _context.ConfigurationMaster.Add(master);
-                _logger.LogInformation($"Finish => Insert ConfiguartionMaster");
-
-                _logger.LogInformation($"Start => SaveChange");
                 _context.SaveChanges();
-                _logger.LogInformation($"Finish => SaveChange");
-
-                response.Success = true;
+                result.Success = true;
+                _logger.LogInformation($"Finish Function => {methodName}, Result => {JsonSerializer.Serialize(result)}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Fail => {MethodBase.GetCurrentMethod().Name}");
-                throw new ArgumentException("Error: ", ex);
+                var messageError = $"Error Function => {methodName}";
+                _logger.LogError(ex, messageError);
+                throw new ArgumentException(messageError, ex);
             }
 
-            return response;
+            return result;
         }
 
         public ResponseModel Update(ConfigurationMaster configurationMaster)
         {
-            var response = new ResponseModel();
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            var result = new ResponseModel();
 
             try
             {
+
                 if (_context.ConfigurationMaster.Any(master => master.ID == configurationMaster.ID))
                 {
-                    _logger.LogInformation($"Start => Update value ConfiguartionMaster");
+                    _logger.LogInformation($"Start Function => {methodName}, Parameters => {JsonSerializer.Serialize(configurationMaster)}");
                     _context.ConfigurationMaster.Update(configurationMaster);
-                    _logger.LogInformation($"Finish => Update value ConfiguartionMaster");
-
-                    _logger.LogInformation($"Start => SaveChange");
                     _context.SaveChanges();
-                    _logger.LogInformation($"Finish => SaveChange");
-
-                    response.Success = true;
+                    result.Success = true;
+                    _logger.LogInformation($"Finish Function => {methodName}, Result => {JsonSerializer.Serialize(result)}");
                 }
                 else
                 {
-                    _logger.LogInformation($"Inquiry => ConfiguartionMaster Data no found.");
+                    _logger.LogInformation($"Start Function => {methodName}, Inquiry => ConfiguartionMaster Data no found.");
                 }
+
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Fail => {MethodBase.GetCurrentMethod().Name}");
-                throw new ArgumentException("Error: ", ex);
+                var messageError = $"Error Function => {methodName}";
+                _logger.LogError(ex, messageError);
+                throw new ArgumentException(messageError, ex);
             }
 
-            return response;
+            return result;
         }
 
         public ResponseModel Delete(ConfigurationMaster configurationMaster)
         {
-            var response = new ResponseModel();
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            var result = new ResponseModel();
 
             try
             {
-                _logger.LogInformation($"Start => Delete ConfiguartionMaster");
+                _logger.LogInformation($"Start Function => {methodName}, Parameters => {JsonSerializer.Serialize(configurationMaster)}");
                 _context.ConfigurationMaster.Remove(_context.ConfigurationMaster.FirstOrDefault(r => r.ID == configurationMaster.ID));
-                _logger.LogInformation($"Finish => Delete ConfiguartionMaster");
-
-                _logger.LogInformation($"Start => Delete ConfiguartionMaster");
-                _context.ConfigurationDetail.AddRange(_context.ConfigurationDetail.Where(r => r.ConfigurationID == configurationMaster.ID));
-                _logger.LogInformation($"Finish => Delete ConfiguartionMaster");
-
-                _logger.LogInformation($"Start => SaveChange");
+                _context.ConfigurationDetail.AddRange(_context.ConfigurationDetail.Where(r => r.ConfigurationID == configurationMaster.ID).ToList());
                 _context.SaveChanges();
-                _logger.LogInformation($"Finish => SaveChange");
-
-                response.Success = true;
+                result.Success = true;
+                _logger.LogInformation($"Finish Function => {methodName}, Result => {JsonSerializer.Serialize(result)}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Fail => {MethodBase.GetCurrentMethod().Name}");
-                throw new ArgumentException("Error: ", ex);
+                var messageError = $"Error Function => {methodName}";
+                _logger.LogError(ex, messageError);
+                throw new ArgumentException(messageError, ex);
             }
 
-            return response;
+            return result;
         }
         #endregion
 
         #region Detail
         public List<ConfigurationDetail> InquiryDetail(Guid masterID)
         {
+            var methodName = MethodBase.GetCurrentMethod().Name;
             var result = new List<ConfigurationDetail>();
 
             try
             {
-                _logger.LogInformation($"Start => Iquiry Inquiry ConfigurationDetail => Datatable");
+                _logger.LogInformation($"Start Function => {methodName}, Parameters => {JsonSerializer.Serialize(masterID)}");
                 result.AddRange(_context.ConfigurationDetail.Where(r => r.ConfigurationID == masterID).OrderBy(r => r.Order).ToList());
-                _logger.LogInformation($"Finish => Iquiry Inquiry ConfigurationDetail => Datatable");
+                _logger.LogInformation($"Finish Function => {methodName}, Result => {JsonSerializer.Serialize(result)}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Fail => {MethodBase.GetCurrentMethod().Name}");
-                throw new ArgumentException("Error: ", ex);
+                var messageError = $"Error Function => {methodName}";
+                _logger.LogError(ex, messageError);
+                throw new ArgumentException(messageError, ex);
             }
 
             return result;
@@ -249,85 +248,82 @@ namespace TCRB.DAL.Configuration
 
         public ResponseModel CreateDetail(List<ConfigurationDetail> details)
         {
-            var response = new ResponseModel();
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            var result = new ResponseModel();
 
             try
             {
-                _logger.LogInformation($"Start => Insert ConfiguartionDetail");
+                _logger.LogInformation($"Start Function => {methodName}, Parameters => {JsonSerializer.Serialize(details)}");
                 _context.ConfigurationDetail.AddRange(details);
-                _logger.LogInformation($"Finish => Insert ConfiguartionDetail");
-
-                _logger.LogInformation($"Start => SaveChange");
                 _context.SaveChanges();
-                _logger.LogInformation($"Finish => SaveChange");
-
-                response.Success = true;
+                result.Success = true;
+                _logger.LogInformation($"Finish Function => {methodName}, Result => {JsonSerializer.Serialize(result)}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Fail => {MethodBase.GetCurrentMethod().Name}");
-                throw new ArgumentException("Error: ", ex);
+                var messageError = $"Error Function => {methodName}";
+                _logger.LogError(ex, messageError);
+                throw new ArgumentException(messageError, ex);
             }
 
-            return response;
+            return result;
         }
 
         public ResponseModel UpdateDetail(List<ConfigurationDetail> details)
         {
-            var response = new ResponseModel();
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            var result = new ResponseModel();
 
             try
             {
+                _logger.LogInformation($"Start Function => {methodName}, Parameters => {JsonSerializer.Serialize(details)}");
                 details.ForEach(detail =>
                 {
                     if (_context.ConfigurationDetail.Any(r => r.ID == detail.ID))
                     {
-                        _logger.LogInformation($"Start => Update value ConfiguartionDetail ID: {detail.ID}");
                         _context.Update(detail);
-                        _logger.LogInformation($"Finish => Update value ConfiguartionDetail ID: {detail.ID}");
                     }
                     else
                     {
                         _logger.LogInformation($"Inquiry => ConfiguartionDetail Data no found ID: {detail.ID}");
                     }
                 });
-
                 _context.SaveChanges();
+                result.Success = true;
+                _logger.LogInformation($"Finish Function => {methodName}, Result => {JsonSerializer.Serialize(result)}");
 
-                response.Success = true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Fail => {MethodBase.GetCurrentMethod().Name}");
-                throw new ArgumentException("Error: ", ex);
+                var messageError = $"Error Function => {methodName}";
+                _logger.LogError(ex, messageError);
+                throw new ArgumentException(messageError, ex);
             }
 
-            return response;
+            return result;
         }
 
         public ResponseModel DeleteDetail(Guid masterID, List<Guid> detailsID)
         {
-            var response = new ResponseModel();
+            var methodName = MethodBase.GetCurrentMethod().Name;
+            var result = new ResponseModel();
 
             try
             {
-                _logger.LogInformation($"Start => Delete ConfiguartionDetail");
+                _logger.LogInformation($"Start Function => {methodName}, Parameters => {JsonSerializer.Serialize(new { masterID, detailsID })}");
                 _context.ConfigurationDetail.RemoveRange(_context.ConfigurationDetail.Where(r => r.ConfigurationID == masterID && !detailsID.Contains(r.ID)));
-                _logger.LogInformation($"Finish => Delete ConfiguartionDetail");
-
-                _logger.LogInformation($"Start => SaveChange");
                 _context.SaveChanges();
-                _logger.LogInformation($"Finish => SaveChange");
-
-                response.Success = true;
+                result.Success = true;
+                _logger.LogInformation($"Finish Function => {methodName}, Result => {JsonSerializer.Serialize(result)}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Fail => {MethodBase.GetCurrentMethod().Name}");
-                throw new ArgumentException("Error: ", ex);
+                var messageError = $"Error Function => {methodName}";
+                _logger.LogError(ex, messageError);
+                throw new ArgumentException(messageError, ex);
             }
 
-            return response;
+            return result;
         }
         #endregion
 

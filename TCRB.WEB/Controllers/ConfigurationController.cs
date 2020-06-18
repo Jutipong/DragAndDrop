@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,7 +11,6 @@ using TCRB.DAL.Model.Authentication;
 using TCRB.DAL.Model.Commons;
 using TCRB.DAL.Model.Configuration;
 using TCRB.HELPER;
-using TCRB.WEB.Models;
 
 namespace TCRB.WEB.Controllers
 {
@@ -20,17 +18,13 @@ namespace TCRB.WEB.Controllers
     public class ConfigurationController : Controller
     {
         private ConfigurationDataService _configurationDataService;
-        private readonly ILogger _logger;
         private readonly IMapper _mapper;
         private readonly UserProfileModel _userProfile;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ConfigurationController(ConfigurationDataService configurationDataService, ILogger<ConfigurationController> logger, IMapper mapper, UserLogin userLogin, IHttpContextAccessor httpContextAccessor)
+        public ConfigurationController(ConfigurationDataService configurationDataService, ILogger<ConfigurationController> logger, IMapper mapper, UserLogin userLogin)
         {
             _configurationDataService = configurationDataService;
             _mapper = mapper;
-            _logger = logger;
-            _httpContextAccessor = httpContextAccessor;
             _userProfile = userLogin.UserProfile();
         }
 

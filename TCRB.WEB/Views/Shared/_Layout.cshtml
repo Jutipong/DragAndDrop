@@ -40,6 +40,7 @@
 
     <!-- bootstrap datepicker -->
     <link href="~/lib/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet" />
+    @*<link href="~/lib/vue-good-table/vue-good-table.css" rel="stylesheet" />*@
 
     <style>
         .BlockUI {
@@ -127,6 +128,8 @@
         <script src="~/lib/vee-validate/vee-validate.min.js"></script>
         <!-- Customs.js -->
         <script src="~/lib/Customs.js"></script>
+
+        @*<script src="~/lib/vue-good-table/vue-good-table.js"></script>*@
     </environment>
 
     <environment names="Staging,Production">
@@ -164,25 +167,28 @@
         <script src="~/lib/vee-validate/vee-validate.min.js"></script>
         <!-- Customs.js -->
         <script src="~/lib/Customs.js"></script>
+
+        @*<script src="~/lib/vue-good-table/vue-good-table.js"></script>*@
     </environment>
 
     @RenderSection("scripts", required: false)
 
     <script type="text/javascript">
-        $(function () {
-            moment.suppressDeprecationWarnings = true;
-            moment.locale('th');
-            var _date = moment().add(543, 'year').format('วันdddd ที่ LL');
-            $("#_date").text(_date);
+            $(function () {
+                moment.suppressDeprecationWarnings = true;
+                moment.locale('th');
+                var _date = moment().add(543, 'year').format('วันdddd ที่ LL');
+                $("#_date").text(_date);
 
-            $("#logout").click(function () {
-                _AlertConfirm(_Config.Confirm.Red, "fa fa-sign-out", "ออกจากระบบ", "คุณต้องการออกจากระบบ ใช่หรือไม่ ?", "ใช่", "ไม่", function (res) {
-                    if (res) {
-                        window.location = '@Url.Action("Logout", "Login")';
-                    }
+                $("#logout").click(function () {
+                    _AlertConfirm(_Config.Confirm.Red, "fa fa-sign-out", "ออกจากระบบ", "คุณต้องการออกจากระบบ ใช่หรือไม่ ?", "ใช่", "ไม่", function (res) {
+                        if (res) {
+                            window.location = '@Url.Action("Logout", "Login")';
+                        }
+                    });
                 });
             });
-        });
     </script>
+
 </body>
 </html>
